@@ -27,6 +27,8 @@ class mainPage extends StatefulWidget {
   _mainPageState createState() => _mainPageState();
 }
 
+int _numTodo = 0;
+
 class _mainPageState extends State<mainPage> {
   ScrollController scrollController;
   SlidingUpPanelController panelController = SlidingUpPanelController();
@@ -43,23 +45,6 @@ class _mainPageState extends State<mainPage> {
     _fabHeight = _initFabHeight;
   }
 
-  // @override
-  // void initState() {
-  //   scrollController = ScrollController();
-  //   scrollController.addListener(() {
-  //     if (scrollController.offset >=
-  //             scrollController.position.maxScrollExtent &&
-  //         !scrollController.position.outOfRange) {
-  //       panelController.expand();
-  //     } else if (scrollController.offset <=
-  //             scrollController.position.minScrollExtent &&
-  //         !scrollController.position.outOfRange) {
-  //       panelController.anchor();
-  //     } else {}
-  //   });
-  //   super.initState();
-  // }
-
   final _items = <Todo>[];
 
   var _todoController = TextEditingController();
@@ -73,6 +58,7 @@ class _mainPageState extends State<mainPage> {
     setState(() {
       _items.add(todo);
       _todoController.text = "";
+      _numTodo++;
     });
   }
 
@@ -169,7 +155,16 @@ class _mainPageState extends State<mainPage> {
               _taskPopUpScreen(context);
             },
           )),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+  
+  // TODO: CHECK THIS AGAIN!
+    
+      // body: SlidingUpPanel(
+      //   renderPanelSheet: false,
+      //   panel: _floatingPanel(),
+      //   collapsed: _floatingcollapsed(),
+      // )
+      // 
       body: SlidingUpPanel(
         margin: EdgeInsets.only(left: 15, right: 15),
         maxHeight: _panelHeightOpen,
@@ -187,6 +182,65 @@ class _mainPageState extends State<mainPage> {
       ),
     );
   }
+
+//TODO: CHECK THIS AGIAN!
+  // Widget _floatingcollapsed() {
+  //   if (_numTodo == 0) {
+  //     return Container(
+  //       decoration: BoxDecoration(
+  //         borderRadius: BorderRadius.only(
+  //             topLeft: Radius.circular(18.0), topRight: Radius.circular(18.0)),
+  //       ),
+  //       margin: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 0.0),
+  //       child: Center(
+  //         child: Text(
+  //           'Nothing to Do TODAY!',
+  //           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  //         ),
+  //       ),
+  //     );
+  //   } else {
+  //     return ListView.separated(
+  //         physics: ClampingScrollPhysics(),
+  //         itemBuilder: (BuildContext context, todo) {
+  //           return ListBody(
+  //               children:
+  //                   _items.map((todo) => _buildItemWidget(todo)).toList());
+  //         });
+  //   }
+  // }
+
+  // Widget _floatingPanel() {
+  //   if (_numTodo == 0) {
+  //     return Container(
+  //         decoration: BoxDecoration(
+  //             color: Colors.white,
+  //             borderRadius: BorderRadius.only(
+  //                 topLeft: Radius.circular(18.0),
+  //                 topRight: Radius.circular(18.0)),
+  //             boxShadow: [
+  //               BoxShadow(
+  //                 blurRadius: 20.0,
+  //                 color: Colors.grey,
+  //               ),
+  //             ]),
+  //         margin: const EdgeInsets.all(24.0),
+  //         child: Center(
+  //           child: Text(
+  //             'Nothing To Do TODAY!',
+  //             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+  //           ),
+  //         ));
+  //   }else{
+  //     return ListView.separated(
+  //         physics: ClampingScrollPhysics(),
+  //         itemBuilder: (BuildContext context, todo) {
+  //           return ListBody(
+  //               children:
+  //                   _items.map((todo) => _buildItemWidget(todo)).toList());
+  //         });      
+  //   }
+  // }
 
   Widget _panel(ScrollController sc) {
     return MediaQuery.removePadding(
@@ -214,9 +268,28 @@ class _mainPageState extends State<mainPage> {
           ListView.separated(
             physics: ClampingScrollPhysics(),
             itemBuilder: (BuildContext context, todo) {
-              return ListBody(
-                  children:
-                      _items.map((todo) => _buildItemWidget(todo)).toList());
+              if (_numTodo == 0) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Divider(
+                      height: 25,
+                      color: Colors.white.withOpacity(1.0),  
+                    ),
+                    Text('Nothing to Do Today!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        )),
+                  ],
+                );
+              } else {
+                return ListBody(
+                    children:
+                        _items.map((todo) => _buildItemWidget(todo)).toList());
+              }
             },
             separatorBuilder: (context, todo) {
               return Divider(
@@ -237,29 +310,29 @@ class _mainPageState extends State<mainPage> {
   }
 
   Widget _buildItemWidget(Todo todo) {
-      return CheckboxListTile(
-        controlAffinity: ListTileControlAffinity.leading,
-        title: Text(
-          todo.title,
-          style: todo.isDone
-              ? TextStyle(
-                  decoration: TextDecoration.lineThrough,
-                  fontStyle: FontStyle.italic,
-                  fontSize: 20,
-                )
-              : TextStyle(
-                  fontSize: 20,
-                ),
-        ),
-        subtitle: Text(
-          DateFormat('MM월 dd일').format(_date),
-          style: TextStyle(fontSize: 15),
-        ),
-        onChanged: (value) {
-          print(value);
-        },
-        value: false,
-      );
+    return CheckboxListTile(
+      controlAffinity: ListTileControlAffinity.leading,
+      title: Text(
+        todo.title,
+        style: todo.isDone
+            ? TextStyle(
+                decoration: TextDecoration.lineThrough,
+                fontStyle: FontStyle.italic,
+                fontSize: 20,
+              )
+            : TextStyle(
+                fontSize: 20,
+              ),
+      ),
+      subtitle: Text(
+        DateFormat('MM월 dd일').format(_date),
+        style: TextStyle(fontSize: 15),
+      ),
+      onChanged: (value) {
+        print(value);
+      },
+      value: false,
+    );
   }
 
   void _taskPopUpScreen(BuildContext context) {
