@@ -236,30 +236,30 @@ class _mainPageState extends State<mainPage> {
     return Container();
   }
 
-
   Widget _buildItemWidget(Todo todo) {
-    return ListTile(
-      onTap: () => _toggleTodo(todo),
-      trailing: Checkbox(
+      return CheckboxListTile(
+        controlAffinity: ListTileControlAffinity.leading,
+        title: Text(
+          todo.title,
+          style: todo.isDone
+              ? TextStyle(
+                  decoration: TextDecoration.lineThrough,
+                  fontStyle: FontStyle.italic,
+                  fontSize: 20,
+                )
+              : TextStyle(
+                  fontSize: 20,
+                ),
+        ),
+        subtitle: Text(
+          DateFormat('MM월 dd일').format(_date),
+          style: TextStyle(fontSize: 15),
+        ),
         onChanged: (value) {
           print(value);
         },
-        activeColor: Theme.of(context).primaryColor,
         value: false,
-      ),
-      title: Text(
-        todo.title,
-        style: todo.isDone
-            ? TextStyle(
-                decoration: TextDecoration.lineThrough,
-                fontStyle: FontStyle.italic,
-              )
-            : null,
-      ),
-      subtitle: Text(
-        _date.toString(),
-      ),
-    );
+      );
   }
 
   void _taskPopUpScreen(BuildContext context) {
